@@ -29,6 +29,7 @@ import excecao.CarroNaoEncontradoException;
 import excecao.DataDeCarroInvalidaException;
 import excecao.MotoristaNaoEncontradoException;
 import excecao.ValorDeCarroInvalidoException;
+import excecao.ViolacaoDeConstraintDesconhecidaException;
 import modelo.Carro;
 import modelo.Motorista;
 import service.CarroAppService;
@@ -304,7 +305,7 @@ public class DialogCarro extends JDialog implements ActionListener {
 					novo();
 
 					JOptionPane.showMessageDialog(this, "Carro não encontrado", "", JOptionPane.ERROR_MESSAGE);
-				}
+				} 
 			}
 		} else if (obj == removerButton) {
 			try {

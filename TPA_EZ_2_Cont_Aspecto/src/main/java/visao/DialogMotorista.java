@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import excecao.MotoristaNaoEncontradoException;
+import excecao.ViolacaoDeConstraintDesconhecidaException;
 import modelo.Motorista;
 import service.MotoristaAppService;
 import util.Util;
@@ -274,6 +275,9 @@ public class DialogMotorista extends JDialog implements ActionListener
 				
 				JOptionPane.showMessageDialog(this, "Motorista não encontrado", "", 
 					JOptionPane.ERROR_MESSAGE);
+			}
+			catch (ViolacaoDeConstraintDesconhecidaException e3){
+				JOptionPane.showMessageDialog(this, "Motorista com carros registrados, não é possível remover", "", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else if(obj == cancelarButton)
