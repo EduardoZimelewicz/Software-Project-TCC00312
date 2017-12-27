@@ -9,10 +9,13 @@ import modelo.Motorista;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import anotacao.ROLE_ADMIN;
+import anotacao.ROLE_USER1;
 import util.Util;
 import dao.CarroDAO;
 import dao.MotoristaDAO;
 import excecao.DataDeCarroInvalidaException;
+import excecao.FaltaPrivilegioException;
 import excecao.CarroNaoEncontradoException;
 import excecao.ObjetoNaoEncontradoException;
 import excecao.MotoristaNaoEncontradoException;
@@ -42,8 +45,10 @@ public class CarroAppService
 	}
 	
 	@Transactional
+	@ROLE_ADMIN
+	@ROLE_USER1
 	public void altera(Carro umCarro)
-		throws CarroNaoEncontradoException
+		throws CarroNaoEncontradoException, FaltaPrivilegioException
 	{	try
 		{	
 			carroDAO.getPorIdComLock(umCarro.getId());
@@ -55,10 +60,13 @@ public class CarroAppService
 	}
 	
 	@Transactional
+	@ROLE_ADMIN
+	@ROLE_USER1
 	public long inclui(Carro umCarro) 
 		throws MotoristaNaoEncontradoException, 
 		       ValorDeCarroInvalidoException, 
-		       DataDeCarroInvalidaException 
+		       DataDeCarroInvalidaException,
+		       FaltaPrivilegioException
 	{	
 		
 		Motorista umMotorista = umCarro.getMotorista();
@@ -115,8 +123,9 @@ public class CarroAppService
 	}
 	
 	@Transactional
+	@ROLE_ADMIN
 	public void exclui(Carro umCarro) 
-		throws CarroNaoEncontradoException 
+		throws CarroNaoEncontradoException, FaltaPrivilegioException 
 	{	
 		try
 		{	umCarro = carroDAO.getPorId(umCarro.getId());

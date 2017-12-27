@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import modelo.Carro;
@@ -15,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import excecao.CarroNaoEncontradoException;
+import excecao.FaltaPrivilegioException;
 
 public class CarroModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
@@ -199,6 +201,8 @@ public class CarroModel extends AbstractTableModel {
 			carroService.altera(umCarro);
 		} catch (CarroNaoEncontradoException e) {
 			e.printStackTrace();
+		} catch(FaltaPrivilegioException fpe){
+			fpe.printStackTrace();
 		}
 	}
 }

@@ -10,16 +10,23 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.reflections.Reflections;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import anotacao.ROLE_ADMIN;
+import anotacao.ROLE_USER1;
+import excecao.FaltaPrivilegioException;
 import excecao.ViolacaoDeConstraintDesconhecidaException;
+import util.PermissoesSingleton;
 
 @Aspect
 public class AspectoAround 
 {
 	private static Map<String, Class<?>> map = new HashMap<String, Class<?>>();
 	private static List<String> listaDeNomesDeConstraints;
+	private static PermissoesSingleton permissao = PermissoesSingleton.getPermissoesSingleton();
+	private static ArrayList<String> permissoes = permissao.getPermissoes();
 	
 	static
 	{
@@ -41,7 +48,22 @@ public class AspectoAround
 	@Around("traduzExcecaoAround()")
 	public Object traduzExcecaoAround(ProceedingJoinPoint joinPoint) throws Throwable 
 	{	try
-		{	return joinPoint.proceed();
+		{	
+			MethodSignature assinatura = (MethodSignature)joinPoint.getSignature();
+			java.lang.reflect.Method metodo = assinatura.getMethod();
+			
+			if(metodo.isAnnotationPresent(ROLE_USER1.class)){
+				if(!permissoes.contains("ROLE_USER1")) throw new FaltaPrivilegioException("O usuário "
+						+ "atual não possui permissão");
+			}
+			
+			else if(metodo.isAnnotationPresent(ROLE_ADMIN.class)){
+				if(!permissoes.contains("ROLE_ADMIN")) throw new FaltaPrivilegioException("O usuário "
+						+ "atual não possui permissão");
+			}
+			
+			
+			return joinPoint.proceed();
 		}
 		catch(org.springframework.dao.DataAccessException e)
 		{	

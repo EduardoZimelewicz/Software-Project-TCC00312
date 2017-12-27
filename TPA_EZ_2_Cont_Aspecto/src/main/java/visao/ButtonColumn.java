@@ -119,7 +119,6 @@ public class ButtonColumn extends AbstractCellEditor implements TableCellRendere
 			} else {
 				Motorista umMotorista = motoristaService.recuperaUmMotorista((Long) table.getValueAt(table.getSelectedRow(), 0));
 				dialogCarro.setMotoristaName(umMotorista);
-				//dialogAnimal.editavel();
 				dialogTabelaMotorista.dispose();
 			}
 		} catch (MotoristaNaoEncontradoException e1) {

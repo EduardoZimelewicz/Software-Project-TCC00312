@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import excecao.FaltaPrivilegioException;
 import excecao.MotoristaNaoEncontradoException;
 import excecao.ViolacaoDeConstraintDesconhecidaException;
 import modelo.Motorista;
@@ -71,7 +72,7 @@ public class DialogMotorista extends JDialog implements ActionListener
 		getContentPane().setLayout(null);
 
 		JPanel panel = new JPanel();
-		panel.setBounds(10, 11, 544, 224);
+		panel.setBounds(0, 0, 554, 248);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
@@ -81,45 +82,45 @@ public class DialogMotorista extends JDialog implements ActionListener
 		panel.add(cadastrarLabel);
 		
 		JLabel nomeLabel = new JLabel("Nome");
-		nomeLabel.setBounds(42, 61, 46, 14);
+		nomeLabel.setBounds(42, 72, 46, 14);
 		panel.add(nomeLabel);
 		
 		JLabel carteiraLabel = new JLabel("Carteira");
-		carteiraLabel.setBounds(42, 90, 66, 14);
+		carteiraLabel.setBounds(42, 109, 66, 14);
 		panel.add(carteiraLabel);
 		
 		JLabel descricaoLabel = new JLabel("Descrição");
-		descricaoLabel.setBounds(42, 143, 46, 14);
+		descricaoLabel.setBounds(42, 189, 46, 14);
 		panel.add(descricaoLabel);
 		
 		JLabel dataCadastroLabel = new JLabel("Data");
-		dataCadastroLabel.setBounds(42, 118, 46, 14);
+		dataCadastroLabel.setBounds(42, 152, 46, 14);
 		panel.add(dataCadastroLabel);
 		
 		nomeTextField = new JTextField();
 		nomeLabel.setLabelFor(nomeTextField);
-		nomeTextField.setBounds(98, 58, 278, 20);
+		nomeTextField.setBounds(98, 69, 278, 20);
 		panel.add(nomeTextField);
 		nomeTextField.setColumns(50);
 		panel.add(nomeLabel);
 		
 		numCarteiraTextField = new JTextField();
 		carteiraLabel.setLabelFor(numCarteiraTextField);
-		numCarteiraTextField.setBounds(98, 87, 278, 20);
+		numCarteiraTextField.setBounds(98, 106, 278, 20);
 		panel.add(numCarteiraTextField);
 		numCarteiraTextField.setColumns(50);
 		panel.add(carteiraLabel);
 		
 		descricaoTextField = new JTextField();
 		descricaoLabel.setLabelFor(descricaoTextField);
-		descricaoTextField.setBounds(98, 140, 278, 20);
+		descricaoTextField.setBounds(98, 186, 278, 20);
 		panel.add(descricaoTextField);
 		descricaoTextField.setColumns(50);
 		panel.add(descricaoLabel);
 		
 		dataDeCadastroTextField = new JTextField();
 		dataCadastroLabel.setLabelFor(dataDeCadastroTextField);
-		dataDeCadastroTextField.setBounds(98, 115, 278, 20);
+		dataDeCadastroTextField.setBounds(98, 149, 278, 20);
 		panel.add(dataDeCadastroTextField);
 		dataDeCadastroTextField.setColumns(50);
 		panel.add(dataCadastroLabel);
@@ -127,25 +128,25 @@ public class DialogMotorista extends JDialog implements ActionListener
 		nomeMensagem = new JLabel("");
 		nomeMensagem.setForeground(Color.RED);
 		nomeMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		nomeMensagem.setBounds(118, 75, 241, 14);
+		nomeMensagem.setBounds(98, 87, 241, 14);
 		panel.add(nomeMensagem);
 		
 		numCarteiraMensagem = new JLabel("");
 		numCarteiraMensagem.setForeground(Color.RED);
 		numCarteiraMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		numCarteiraMensagem.setBounds(118, 112, 241, 14);
+		numCarteiraMensagem.setBounds(98, 124, 241, 14);
 		panel.add(numCarteiraMensagem);
 		
 		descricaoMensagem = new JLabel("");
 		descricaoMensagem.setForeground(Color.RED);
 		descricaoMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		descricaoMensagem.setBounds(118, 155, 241, 14);
+		descricaoMensagem.setBounds(98, 203, 241, 14);
 		panel.add(descricaoMensagem);
 		
 		dataDeCadastroMensagem = new JLabel("");
 		dataDeCadastroMensagem.setForeground(Color.RED);
 		dataDeCadastroMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		dataDeCadastroMensagem.setBounds(118, 155, 241, 14);
+		dataDeCadastroMensagem.setBounds(98, 169, 241, 14);
 		panel.add(dataDeCadastroMensagem);
 		
 		novoButton = new JButton("Novo");
@@ -217,12 +218,17 @@ public class DialogMotorista extends JDialog implements ActionListener
 				umMotorista.setNumCarteira(numCarteiraTextField.getText());
 				umMotorista.setDataCadastro(Util.strToCalendar(dataDeCadastroTextField.getText()));
 
-				motoristaAppService.inclui(umMotorista);	// inclui o cliente
-				
-				salvo();
-				
-				JOptionPane.showMessageDialog(this, "Motorista cadastrado com sucesso", "", 
-						JOptionPane.INFORMATION_MESSAGE);
+				try{
+					motoristaAppService.inclui(umMotorista);	// inclui o cliente
+					salvo();
+					
+					JOptionPane.showMessageDialog(this, "Motorista cadastrado com sucesso", "", 
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+				catch(FaltaPrivilegioException fpe){
+					JOptionPane.showMessageDialog(this, fpe.getMessage(), "", 
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		}
 		else if(obj == editarButton)
@@ -256,6 +262,10 @@ public class DialogMotorista extends JDialog implements ActionListener
 					JOptionPane.showMessageDialog(this, "Motorista não encontrado", "", 
 						JOptionPane.ERROR_MESSAGE);
 				}
+				catch (FaltaPrivilegioException fpe){
+					JOptionPane.showMessageDialog(this, fpe.getMessage(), "", 
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		}
 		else if(obj == removerButton)
@@ -277,7 +287,12 @@ public class DialogMotorista extends JDialog implements ActionListener
 					JOptionPane.ERROR_MESSAGE);
 			}
 			catch (ViolacaoDeConstraintDesconhecidaException e3){
-				JOptionPane.showMessageDialog(this, "Motorista com carros registrados, não é possível remover", "", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e3.getMessage()
+						, "", JOptionPane.ERROR_MESSAGE);
+			}
+			catch(FaltaPrivilegioException fpe){
+				JOptionPane.showMessageDialog(this, fpe.getMessage()
+						, "", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else if(obj == cancelarButton)

@@ -7,8 +7,11 @@ import modelo.Motorista;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import anotacao.ROLE_ADMIN;
+import anotacao.ROLE_USER1;
 import dao.MotoristaDAO;
 import excecao.ObjetoNaoEncontradoException;
+import excecao.FaltaPrivilegioException;
 import excecao.MotoristaNaoEncontradoException;
 
 // @Service
@@ -22,7 +25,9 @@ public class MotoristaAppService
 	}
 	
 	@Transactional
-	public long inclui(Motorista umMotorista) 
+	@ROLE_ADMIN
+	@ROLE_USER1
+	public long inclui(Motorista umMotorista) throws FaltaPrivilegioException
 	{	return motoristaDAO.inclui(umMotorista).getId();
 	}
 
@@ -36,8 +41,10 @@ public class MotoristaAppService
 	}
 	
 	@Transactional
+	@ROLE_ADMIN
+	@ROLE_USER1
 	public void altera(Motorista umMotorista)
-		throws MotoristaNaoEncontradoException
+		throws MotoristaNaoEncontradoException, FaltaPrivilegioException
 	{	try
 		{	
 			motoristaDAO.getPorIdComLock(umMotorista.getId());
@@ -49,8 +56,9 @@ public class MotoristaAppService
 	}
 
 	@Transactional
+	@ROLE_ADMIN
 	public void exclui(Motorista umMotorista) 
-		throws MotoristaNaoEncontradoException
+		throws MotoristaNaoEncontradoException, FaltaPrivilegioException
 	{	try
 		{	
 			Motorista motorista = motoristaDAO.recuperaUmMotoristaECarros(umMotorista.getId());

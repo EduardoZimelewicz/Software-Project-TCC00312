@@ -27,6 +27,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import excecao.CarroNaoEncontradoException;
 import excecao.DataDeCarroInvalidaException;
+import excecao.FaltaPrivilegioException;
 import excecao.MotoristaNaoEncontradoException;
 import excecao.ValorDeCarroInvalidoException;
 import excecao.ViolacaoDeConstraintDesconhecidaException;
@@ -80,6 +81,7 @@ public class DialogCarro extends JDialog implements ActionListener {
 		modeloTextField.setText(umCarro.getModelo());
 		valorField.setText(Util.doubleToStr(umCarro.getValor()));
 		placaField.setText(umCarro.getPlaca());
+		motoristaField.setText(umCarro.getMotorista().getNome());
 		dataField.setText(Util.calendarToStr(umCarro.getDataFabricacao()));
 		
 		modeloMensagem.setText("");
@@ -96,7 +98,7 @@ public class DialogCarro extends JDialog implements ActionListener {
 
 		modeloMensagem.setText("");
 	}
-
+	
 	public DialogCarro(JFrame frame) {
 		super(frame);
 
@@ -154,13 +156,13 @@ public class DialogCarro extends JDialog implements ActionListener {
 		placaMensagem = new JLabel("");
 		placaMensagem.setForeground(Color.RED);
 		placaMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		placaMensagem.setBounds(149, 142, 241, 14);
+		placaMensagem.setBounds(148, 185, 241, 14);
 		panel.add(placaMensagem);
 
 		valorMensagem = new JLabel("");
 		valorMensagem.setForeground(Color.RED);
 		valorMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		valorMensagem.setBounds(148, 186, 241, 14);
+		valorMensagem.setBounds(148, 267, 241, 14);
 		panel.add(valorMensagem);
 
 		novoButton = new JButton("Novo");
@@ -230,7 +232,7 @@ public class DialogCarro extends JDialog implements ActionListener {
 		motoristaMensagem = new JLabel("");
 		motoristaMensagem.setForeground(Color.RED);
 		motoristaMensagem.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		motoristaMensagem.setBounds(148, 230, 241, 14);
+		motoristaMensagem.setBounds(148, 140, 241, 14);
 		panel.add(motoristaMensagem);
 
 		
@@ -277,6 +279,8 @@ public class DialogCarro extends JDialog implements ActionListener {
 				} catch (DataDeCarroInvalidaException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+				} catch (FaltaPrivilegioException fpe){
+					JOptionPane.showMessageDialog(this, fpe.getMessage(), "", JOptionPane.ERROR_MESSAGE);
 				}
 				salvo();
 
@@ -289,12 +293,12 @@ public class DialogCarro extends JDialog implements ActionListener {
 			boolean deuErro = validaCarro();
 
 			if (!deuErro) {
-				umCarro.setModelo(modeloTextField.getText());
-				umCarro.setPlaca(placaField.getText());
-				umCarro.setValor(Util.strToDouble(Util.calendarToStr(umCarro.getDataFabricacao())));
-				umCarro.setDataFabricacao(Util.strToCalendar(dataField.getText()));
 				
 				try {
+					umCarro.setModelo(modeloTextField.getText());
+					umCarro.setPlaca(placaField.getText());
+					umCarro.setValor(Util.strToDouble(valorField.getText()));
+					umCarro.setDataFabricacao(Util.strToCalendar(dataField.getText()));
 					carroService.altera(umCarro);
 
 					salvo();
@@ -306,6 +310,15 @@ public class DialogCarro extends JDialog implements ActionListener {
 
 					JOptionPane.showMessageDialog(this, "Carro não encontrado", "", JOptionPane.ERROR_MESSAGE);
 				} 
+				catch(FaltaPrivilegioException fpe){
+					JOptionPane.showMessageDialog(this, fpe.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+				}
+				catch(NumberFormatException nfe){
+					JOptionPane.showMessageDialog(this, "Por favor, retire a vírgula e "
+							+ "os zeros após o valor do carro"
+							, "", JOptionPane.ERROR_MESSAGE);
+				}
+				
 			}
 		} else if (obj == removerButton) {
 			try {
@@ -318,6 +331,9 @@ public class DialogCarro extends JDialog implements ActionListener {
 				novo();
 
 				JOptionPane.showMessageDialog(this, "Carro não encontrado", "", JOptionPane.ERROR_MESSAGE);
+			}
+			catch(FaltaPrivilegioException fpe){
+				JOptionPane.showMessageDialog(this, fpe.getMessage(), "", JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (obj == cancelarButton) {
 			try {
@@ -374,6 +390,13 @@ public class DialogCarro extends JDialog implements ActionListener {
 			}
 			*/
 
+		}
+		
+		if (placaField.getText().trim().length() == 0){
+			placaMensagem.setText("Campo de preenchimento obrigatório");
+		}
+		else{
+			placaMensagem.setText("");
 		}
 
 		if (dataField.getText().trim().length() == 0) {

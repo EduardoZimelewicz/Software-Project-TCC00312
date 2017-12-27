@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import service.MotoristaAppService;
+import excecao.FaltaPrivilegioException;
 import excecao.MotoristaNaoEncontradoException;
 import modelo.Motorista;
 
@@ -195,6 +197,8 @@ public class MotoristaModel extends AbstractTableModel {
 			motoristaService.altera(umMotorista);
 		} catch (MotoristaNaoEncontradoException e) {
 			e.printStackTrace();
+		}catch(FaltaPrivilegioException fpe){
+			fpe.printStackTrace();
 		}
 	}
 }
